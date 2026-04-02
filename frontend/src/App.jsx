@@ -24,7 +24,7 @@ import {
   Sparkles,
 } from "lucide-react";
 
-const STORAGE_KEY = "ssag-command-center-v3";
+const STORAGE_KEY = "ssag-command-center-v4";
 
 const currency = (n) =>
   new Intl.NumberFormat("en-US", {
@@ -65,7 +65,7 @@ const seedData = {
   company: {
     name: "SSAG Command Center",
     owner: "Cezar Morris",
-    version: "v3.0",
+    version: "v4.0",
     buildStandard: "SSAG",
     lastUpdated: todayISO(),
   },
@@ -426,6 +426,8 @@ export default function App() {
                   ? "Paid"
                   : paymentStatus === "Pending Payment"
                   ? "Unpaid"
+                  : paymentStatus === "Overdue"
+                  ? "Overdue"
                   : "Unpaid",
               paidDate: paymentStatus === "Paid" ? todayISO() : "",
             }
@@ -748,8 +750,4 @@ export default function App() {
       count: filteredDeals.filter((d) => d.status === stage).length,
       value: filteredDeals
         .filter((d) => d.status === stage)
-        .reduce((sum, d) => sum + Number(d.value || 0), 0),
-    }));
-  }, [filteredDeals]);
-
-  const divisionSummary = useMe
+        .reduce((sum, d) => sum + Number(d.val
