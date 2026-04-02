@@ -1,57 +1,34 @@
 import { useState } from "react";
 
-const initialDeals = [
-  {
-    id: 1,
-    client: "Desert Ridge Dental",
-    company: "Desert Ridge Dental",
-    service: "Risk Assessment",
-    value: 4500,
-    status: "Closed",
-    paymentStatus: "Unpaid",
-    owner: "Cezar",
-    source: "Outbound",
-    closeDate: "2026-04-02",
-  },
-];
-
 export default function App() {
-  const [deals, setDeals] = useState(initialDeals);
+  const [deals, setDeals] = useState([
+    {
+      id: 1,
+      client: "Desert Ridge Dental",
+      value: 4500,
+      status: "Closed",
+      paymentStatus: "Unpaid",
+    },
+  ]);
 
-  // ✅ CHANGE DEAL STATUS
   const updateStatus = (id, newStatus) => {
     setDeals((prev) =>
-      prev.map((d) =>
-        d.id === id
-          ? {
-              ...d,
-              status: newStatus,
-              closeDate:
-                newStatus === "Closed"
-                  ? new Date().toISOString().split("T")[0]
-                  : d.closeDate,
-            }
-          : d
+      prev.map((deal) =>
+        deal.id === id ? { ...deal, status: newStatus } : deal
       )
     );
   };
 
-  // ✅ CHANGE PAYMENT STATUS (THIS IS WHAT WAS BROKEN)
   const updatePayment = (id, newPayment) => {
     setDeals((prev) =>
-      prev.map((d) =>
-        d.id === id
-          ? {
-              ...d,
-              paymentStatus: newPayment,
-            }
-          : d
+      prev.map((deal) =>
+        deal.id === id ? { ...deal, paymentStatus: newPayment } : deal
       )
     );
   };
 
   return (
-    <div style={{ padding: 20, fontFamily: "sans-serif" }}>
+    <div style={{ padding: 20 }}>
       <h2>SSAG Command Center</h2>
 
       {deals.map((deal) => (
@@ -60,40 +37,43 @@ export default function App() {
           style={{
             border: "1px solid #ccc",
             padding: 15,
-            marginBottom: 15,
+            marginBottom: 10,
             borderRadius: 10,
           }}
         >
           <h3>{deal.client}</h3>
 
-          <p>Status: {deal.status}</p>
-          <p>Payment: {deal.paymentStatus}</p>
           <p>Value: ${deal.value}</p>
 
           {/* STATUS DROPDOWN */}
-          <select
-            value={deal.status}
-            onChange={(e) => updateStatus(deal.id, e.target.value)}
-          >
-            <option>Lead</option>
-            <option>Contacted</option>
-            <option>Proposal Sent</option>
-            <option>Negotiation</option>
-            <option>Closed</option>
-            <option>Lost</option>
-          </select>
+          <div style={{ marginBottom: 10 }}>
+            <label>Status: </label>
+            <select
+              value={deal.status}
+              onChange={(e) => updateStatus(deal.id, e.target.value)}
+            >
+              <option>Lead</option>
+              <option>Contacted</option>
+              <option>Proposal Sent</option>
+              <option>Negotiation</option>
+              <option>Closed</option>
+              <option>Lost</option>
+            </select>
+          </div>
 
-          {/* PAYMENT DROPDOWN (FIXED) */}
-          <select
-            value={deal.paymentStatus}
-            onChange={(e) => updatePayment(deal.id, e.target.value)}
-            style={{ marginLeft: 10 }}
-          >
-            <option>Unpaid</option>
-            <option>Pending Payment</option>
-            <option>Paid</option>
-            <option>Overdue</option>
-          </select>
+          {/* PAYMENT DROPDOWN (THIS IS WHAT YOU WERE MISSING) */}
+          <div>
+            <label>Payment: </label>
+            <select
+              value={deal.paymentStatus}
+              onChange={(e) => updatePayment(deal.id, e.target.value)}
+            >
+              <option>Unpaid</option>
+              <option>Pending Payment</option>
+              <option>Paid</option>
+              <option>Overdue</option>
+            </select>
+          </div>
         </div>
       ))}
     </div>
