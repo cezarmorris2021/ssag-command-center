@@ -24,7 +24,7 @@ import {
   Sparkles,
 } from "lucide-react";
 
-const STORAGE_KEY = "ssag-command-center-v4";
+const STORAGE_KEY = "ssag-command-center-v5";
 
 const currency = (n) =>
   new Intl.NumberFormat("en-US", {
@@ -65,7 +65,7 @@ const seedData = {
   company: {
     name: "SSAG Command Center",
     owner: "Cezar Morris",
-    version: "v4.0",
+    version: "v5.0",
     buildStandard: "SSAG",
     lastUpdated: todayISO(),
   },
@@ -402,7 +402,12 @@ export default function App() {
         amount: Number(deal.value || 0),
         dueDate: todayISO(),
         paidDate: deal.paymentStatus === "Paid" ? todayISO() : "",
-        status: deal.paymentStatus === "Paid" ? "Paid" : "Unpaid",
+        status:
+          deal.paymentStatus === "Paid"
+            ? "Paid"
+            : deal.paymentStatus === "Overdue"
+            ? "Overdue"
+            : "Unpaid",
         method: "Invoice",
         notes: `Auto-created from closed deal: ${deal.service}`,
       };
@@ -424,8 +429,6 @@ export default function App() {
               status:
                 paymentStatus === "Paid"
                   ? "Paid"
-                  : paymentStatus === "Pending Payment"
-                  ? "Unpaid"
                   : paymentStatus === "Overdue"
                   ? "Overdue"
                   : "Unpaid",
@@ -750,4 +753,4 @@ export default function App() {
       count: filteredDeals.filter((d) => d.status === stage).length,
       value: filteredDeals
         .filter((d) => d.status === stage)
-        .reduce((sum, d) => sum + Number(d.val
+        .reduce((sum, d) =
