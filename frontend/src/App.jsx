@@ -7,7 +7,21 @@ export default function App() {
       client: "Desert Ridge Dental",
       value: 4500,
       status: "Closed",
+      paymentStatus: "Paid",
+    },
+    {
+      id: 2,
+      client: "Phoenix HVAC LLC",
+      value: 2500,
+      status: "Lead",
       paymentStatus: "Unpaid",
+    },
+    {
+      id: 3,
+      client: "Copper State Medical",
+      value: 3800,
+      status: "Negotiation",
+      paymentStatus: "Pending Payment",
     },
   ]);
 
@@ -28,7 +42,7 @@ export default function App() {
   };
 
   return (
-    <div style={{ padding: 20 }}>
+    <div style={{ padding: 20, maxWidth: 500 }}>
       <h2>SSAG Command Center</h2>
 
       {deals.map((deal) => (
@@ -37,7 +51,7 @@ export default function App() {
           style={{
             border: "1px solid #ccc",
             padding: 15,
-            marginBottom: 10,
+            marginBottom: 15,
             borderRadius: 10,
           }}
         >
@@ -45,7 +59,7 @@ export default function App() {
 
           <p>Value: ${deal.value}</p>
 
-          {/* STATUS DROPDOWN */}
+          {/* STATUS */}
           <div style={{ marginBottom: 10 }}>
             <label>Status: </label>
             <select
@@ -61,7 +75,7 @@ export default function App() {
             </select>
           </div>
 
-          {/* PAYMENT DROPDOWN (THIS IS WHAT YOU WERE MISSING) */}
+          {/* PAYMENT */}
           <div>
             <label>Payment: </label>
             <select
@@ -78,4 +92,4 @@ export default function App() {
       ))}
     </div>
   );
-}
+      }
