@@ -24,7 +24,7 @@ import {
   Sparkles,
 } from "lucide-react";
 
-const STORAGE_KEY = "ssag-command-center-v2";
+const STORAGE_KEY = "ssag-command-center-v3";
 
 const currency = (n) =>
   new Intl.NumberFormat("en-US", {
@@ -65,7 +65,7 @@ const seedData = {
   company: {
     name: "SSAG Command Center",
     owner: "Cezar Morris",
-    version: "v2.0",
+    version: "v3.0",
     buildStandard: "SSAG",
     lastUpdated: todayISO(),
   },
@@ -91,6 +91,22 @@ const seedData = {
     {
       id: "deal-seed-1",
       divisionId: "div-1",
+      clientName: "Desert Ridge Dental",
+      company: "Desert Ridge Dental",
+      service: "Risk Assessment",
+      value: 4500,
+      status: "Negotiation",
+      paymentStatus: "Unpaid",
+      leadSource: "Outbound",
+      assignedTo: "Cezar",
+      closeDate: "",
+      nextAction: "Follow up on proposal",
+      notes: "High intent. Asked about timeline and deliverables.",
+      createdAt: todayISO(),
+    },
+    {
+      id: "deal-seed-2",
+      divisionId: "div-1",
       clientName: "Copper State Medical",
       company: "Copper State Medical",
       service: "Compliance Advisory",
@@ -109,7 +125,7 @@ const seedData = {
     {
       id: "client-seed-1",
       divisionId: "div-1",
-      sourceDealId: "deal-seed-1",
+      sourceDealId: "deal-seed-2",
       clientName: "Copper State Medical",
       company: "Copper State Medical",
       service: "Compliance Advisory",
@@ -128,7 +144,7 @@ const seedData = {
       id: "invoice-seed-1",
       clientName: "Copper State Medical",
       divisionId: "div-1",
-      sourceDealId: "deal-seed-1",
+      sourceDealId: "deal-seed-2",
       amount: 12000,
       dueDate: todayISO(),
       paidDate: "",
@@ -157,7 +173,7 @@ const seedData = {
       id: "doc-2",
       title: "What was added automatically",
       category: "Documentation",
-      body: "Added auto-client creation, auto-invoice creation for closed deals, payment controls, executive metrics, alert tracking, documentation, and activity logging because those are core enterprise features you should not have to remember to ask for.",
+      body: "Added auto-client creation, auto-invoice creation for closed deals, payment controls, revenue metrics, alert tracking, documentation, and activity logging.",
     },
   ],
 };
@@ -181,7 +197,7 @@ function Pill({ children, tone }) {
   );
 }
 
-function Card({ title, icon: Icon, children, action }) {
+function Card({ title, icon: Icon, children }) {
   return (
     <div className="rounded-3xl border border-slate-200 bg-white shadow-sm">
       <div className="flex items-center justify-between border-b border-slate-100 px-5 py-4">
@@ -189,7 +205,6 @@ function Card({ title, icon: Icon, children, action }) {
           {Icon ? <Icon className="h-5 w-5 text-slate-600" /> : null}
           <h3 className="text-sm font-semibold text-slate-900">{title}</h3>
         </div>
-        {action}
       </div>
       <div className="p-5">{children}</div>
     </div>
@@ -253,18 +268,13 @@ function Select({ label, value, onChange, options }) {
   );
 }
 
-function SectionHeader({ title, subtitle, action }) {
+function SectionHeader({ title, subtitle }) {
   return (
-    <div className="mb-5 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-      <div>
-        <h2 className="text-2xl font-semibold tracking-tight text-slate-900">
-          {title}
-        </h2>
-        {subtitle ? (
-          <p className="mt-1 text-sm text-slate-500">{subtitle}</p>
-        ) : null}
-      </div>
-      {action}
+    <div className="mb-5">
+      <h2 className="text-2xl font-semibold tracking-tight text-slate-900">
+        {title}
+      </h2>
+      {subtitle ? <p className="mt-1 text-sm text-slate-500">{subtitle}</p> : null}
     </div>
   );
 }
@@ -333,7 +343,7 @@ export default function App() {
     [data.divisions]
   );
 
-  function logActivity(type, title, description) {
+  function addActivity(type, title, description) {
     setData((prev) => ({
       ...prev,
       company: { ...prev.company, lastUpdated: todayISO() },
@@ -350,7 +360,7 @@ export default function App() {
     }));
   }
 
-  function upsertAutoClientFromDeal(deal) {
+  function createClientFromDeal(deal) {
     setData((prev) => {
       const exists = prev.clients.some((c) => c.sourceDealId === deal.id);
       if (exists) return prev;
@@ -379,7 +389,7 @@ export default function App() {
     });
   }
 
-  function upsertAutoInvoiceFromDeal(deal) {
+  function createInvoiceFromDeal(deal) {
     setData((prev) => {
       const exists = prev.invoices.some((i) => i.sourceDealId === deal.id);
       if (exists) return prev;
@@ -392,12 +402,7 @@ export default function App() {
         amount: Number(deal.value || 0),
         dueDate: todayISO(),
         paidDate: deal.paymentStatus === "Paid" ? todayISO() : "",
-        status:
-          deal.paymentStatus === "Paid"
-            ? "Paid"
-            : deal.paymentStatus === "Pending Payment"
-            ? "Unpaid"
-            : "Unpaid",
+        status: deal.paymentStatus === "Paid" ? "Paid" : "Unpaid",
         method: "Invoice",
         notes: `Auto-created from closed deal: ${deal.service}`,
       };
@@ -419,8 +424,8 @@ export default function App() {
               status:
                 paymentStatus === "Paid"
                   ? "Paid"
-                  : inv.status === "Overdue"
-                  ? "Overdue"
+                  : paymentStatus === "Pending Payment"
+                  ? "Unpaid"
                   : "Unpaid",
               paidDate: paymentStatus === "Paid" ? todayISO() : "",
             }
@@ -442,23 +447,22 @@ export default function App() {
 
     setData((prev) => ({
       ...prev,
-      company: { ...prev.company, lastUpdated: todayISO() },
       deals: [deal, ...prev.deals],
     }));
 
-    logActivity(
+    addActivity(
       "deal",
-      "New deal created",
+      "Deal created",
       `${deal.clientName} added for ${currency(deal.value)}.`
     );
 
     if (deal.status === "Closed") {
-      upsertAutoClientFromDeal(deal);
-      upsertAutoInvoiceFromDeal(deal);
-      logActivity(
+      createClientFromDeal(deal);
+      createInvoiceFromDeal(deal);
+      addActivity(
         "deal",
-        "Deal closed",
-        `${deal.clientName} was closed and added into client + invoice flow.`
+        "Deal closed at creation",
+        `${deal.clientName} was auto-converted to client and invoice records.`
       );
     }
 
@@ -480,6 +484,7 @@ export default function App() {
 
   function addClient() {
     if (!newClient.clientName || !newClient.service) return;
+
     const client = {
       ...newClient,
       id: safeId("client"),
@@ -491,7 +496,7 @@ export default function App() {
       clients: [client, ...prev.clients],
     }));
 
-    logActivity(
+    addActivity(
       "client",
       "Client added",
       `${client.clientName} added to client accounts.`
@@ -515,6 +520,7 @@ export default function App() {
 
   function addInvoice() {
     if (!newInvoice.clientName || !newInvoice.amount) return;
+
     const invoice = {
       ...newInvoice,
       id: safeId("invoice"),
@@ -526,7 +532,7 @@ export default function App() {
       invoices: [invoice, ...prev.invoices],
     }));
 
-    logActivity(
+    addActivity(
       "finance",
       "Invoice created",
       `${invoice.clientName} invoice created for ${currency(invoice.amount)}.`
@@ -545,68 +551,62 @@ export default function App() {
   }
 
   function updateDealStatus(id, status) {
-    let updatedDeal = null;
+    let updated = null;
 
     setData((prev) => {
       const deals = prev.deals.map((d) => {
         if (d.id !== id) return d;
-        updatedDeal = {
+        updated = {
           ...d,
           status,
           closeDate: status === "Closed" ? d.closeDate || todayISO() : d.closeDate,
         };
-        return updatedDeal;
+        return updated;
       });
 
-      return {
-        ...prev,
-        deals,
-      };
+      return { ...prev, deals };
     });
 
-    if (!updatedDeal) return;
+    if (!updated) return;
 
-    logActivity(
+    addActivity(
       "deal",
       "Deal status updated",
-      `${updatedDeal.clientName} moved to ${status}.`
+      `${updated.clientName} moved to ${status}.`
     );
 
     if (status === "Closed") {
-      upsertAutoClientFromDeal(updatedDeal);
-      upsertAutoInvoiceFromDeal(updatedDeal);
-      logActivity(
+      createClientFromDeal(updated);
+      createInvoiceFromDeal(updated);
+      addActivity(
         "deal",
         "Deal converted",
-        `${updatedDeal.clientName} was auto-converted into client + invoice records.`
+        `${updated.clientName} auto-created client and invoice records.`
       );
     }
   }
 
   function updateDealPaymentStatus(id, paymentStatus) {
-    let updatedDeal = null;
+    let updated = null;
 
     setData((prev) => {
       const deals = prev.deals.map((d) => {
         if (d.id !== id) return d;
-        updatedDeal = { ...d, paymentStatus };
-        return updatedDeal;
+        updated = { ...d, paymentStatus };
+        return updated;
       });
 
-      return {
-        ...prev,
-        deals,
-      };
+      return { ...prev, deals };
     });
 
-    if (!updatedDeal) return;
+    if (!updated) return;
 
     syncInvoicePaymentFromDeal(id, paymentStatus);
 
-    logActivity(
+    addActivity(
       "finance",
       "Payment status updated",
-      `${updatedDeal.clientName} marked as ${paymentStatus}.`
+      `${updated.clientName} marked as ${paymentStatus}.`
     );
   }
 
@@ -620,7 +620,8 @@ export default function App() {
         d.clientName.toLowerCase().includes(q) ||
         d.company.toLowerCase().includes(q) ||
         d.service.toLowerCase().includes(q) ||
-        d.status.toLowerCase().includes(q);
+        d.status.toLowerCase().includes(q) ||
+        d.paymentStatus.toLowerCase().includes(q);
       return matchesDivision && matchesSearch;
     });
   }, [data.deals, search, selectedDivision]);
@@ -693,9 +694,7 @@ export default function App() {
 
   const alerts = useMemo(() => {
     const overdueInvoices = data.invoices.filter((i) => i.status === "Overdue").length;
-    const pendingOnboarding = data.clients.filter(
-      (c) => c.status === "Onboarding"
-    ).length;
+    const pendingOnboarding = data.clients.filter((c) => c.status === "Onboarding").length;
     const stalledDeals = data.deals.filter(
       (d) => d.status === "Negotiation" || d.status === "Proposal Sent"
     ).length;
@@ -753,4 +752,4 @@ export default function App() {
     }));
   }, [filteredDeals]);
 
-  cons
+  const divisionSummary = useMe
