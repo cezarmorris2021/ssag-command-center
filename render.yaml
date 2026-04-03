@@ -1,13 +1,9 @@
 services:
   - type: web
     name: ssag-command-center-backend
-    runtime: node
-    rootDir: ssag_command_center_fullstack/backend
-    buildCommand: npm install
-    startCommand: npm start
+    env: node
     plan: free
-    envVars:
-      - key: JWT_SECRET
-        generateValue: true
-      - key: CORS_ORIGIN
-        value: https://your-frontend-domain.vercel.app
+    rootDir: backend
+    buildCommand: npm install
+    startCommand: node src/server.js
+    autoDeploy: true
