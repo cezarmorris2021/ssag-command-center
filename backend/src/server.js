@@ -218,12 +218,12 @@ app.get("/", (req, res) => {
             }
 
             deals.forEach(d => {
-              container.innerHTML += `
+              container.innerHTML += \`
                 <div class="deal">
-                  <div class="deal-name">${d.name} - $${Number(d.value).toLocaleString()}</div>
-                  <div class="deal-stage">Stage: ${d.stage || 'Lead'}</div>
+                  <div class="deal-name">\${d.name} - $\${Number(d.value).toLocaleString()}</div>
+                  <div class="deal-stage">Stage: \${d.stage || 'Lead'}</div>
                 </div>
-              `;
+              \`;
             });
           }
 
@@ -231,7 +231,10 @@ app.get("/", (req, res) => {
         </script>
       </body>
     </html>
-    // API routes
+  `);
+});
+
+// API routes
 app.get("/api/health", (req, res) => {
   res.json({ status: "SSAG backend running" });
 });
@@ -262,6 +265,4 @@ app.get("/api/analytics", (req, res) => {
 
 app.listen(PORT, () => {
   console.log("SSAG running on port " + PORT);
-});
-  `);
 });
