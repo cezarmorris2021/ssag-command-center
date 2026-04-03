@@ -3,12 +3,12 @@ const app = express();
 
 app.use(express.json());
 
-// ROOT ROUTE (THIS FIXES YOUR PROBLEM)
+// ROOT (fixes your browser issue)
 app.get("/", (req, res) => {
-  res.send("SSAG BACKEND IS LIVE 🚀");
+  res.send("SSAG BACKEND LIVE 🚀");
 });
 
-// TEST DASHBOARD ROUTE
+// TEST ROUTE
 app.get("/dashboard", (req, res) => {
   res.json({
     totalDeals: 0,
@@ -19,8 +19,8 @@ app.get("/dashboard", (req, res) => {
   });
 });
 
-// SERVER START
 const PORT = process.env.PORT || 10000;
+
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log("Server running on port " + PORT);
 });
