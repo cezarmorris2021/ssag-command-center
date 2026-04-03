@@ -1,17 +1,13 @@
 {
   "name": "ssag-command-center-backend",
   "version": "1.0.0",
-  "private": true,
   "type": "module",
+  "main": "src/server.js",
   "scripts": {
-    "dev": "node --watch src/server.js",
     "start": "node src/server.js"
   },
   "dependencies": {
-    "bcryptjs": "^2.4.3",
-    "cors": "^2.8.5",
-    "express": "^4.19.2",
-    "jsonwebtoken": "^9.0.2",
-    "nanoid": "^5.0.7"
+    "express": "^4.21.2",
+    "pg": "^8.12.0"
   }
 }
