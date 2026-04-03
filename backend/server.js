@@ -1,27 +1,63 @@
 const express = require("express");
-const app = express();
+const fs = require("fs");
+const path = require("path");
 
+const app = express();
 app.use(express.json());
 
-let deals = [];
+const DATA_FILE = path.join(__dirname, "deals.json");
 
-// Home
+// Load deals from file
+function loadDeals() {
+  try {
+    const data = fs.readFileSync(DATA_FILE, "utf-8");
+    return JSON.parse(data);
+  } catch {
+    return [];
+  }
+}
+
+// Save deals to file
+function saveDeals(deals) {
+  fs.writeFileSync(DATA_FILE, JSON.stringify(deals, null, 2));
+}
+
+// ROOT
 app.get("/", (req, res) => {
-  res.send(`
-    <html>
-      <head>
-        <title>SSAG Command Center</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <style>
-          body {
-            font-family: Arial, sans-serif;
-            background: #050505;
-            color: #00f5d4;
-            text-align: center;
-            padding: 14px;
-            margin: 0;
-          }
-          h1 { font-size: 34px; margin: 18px 0; }
-          .wrap { max-width: 900px; margin: 0 auto; }
-          .box {
-            border: 1px solid #00f5d
+  res.send("SSAG BACKEND LIVE 🚀");
+});
+
+// ADD DEAL (WORKS IN BROWSER)
+app.get("/add", (req, res) => {
+  const deals = loadDeals();
+
+  const name = req.query.name || "Test Deal";
+  const value = Number(req.query.value || 5000);
+
+  const deal = {
+    id: Date.now(),
+    name,
+    value
+  };
+
+  deals.push(deal);
+  saveDeals(deals);
+
+  res.json({
+    success: true,
+    deal,
+    totalDeals: deals.length
+  });
+});
+
+// DASHBOARD
+app.get("/dashboard", (req, res) => {
+  const deals = loadDeals();
+
+  const totalDeals = deals.length;
+  const totalValue = deals.reduce((sum, d) => sum + d.value, 0);
+  const averageValue = totalDeals ? totalValue / totalDeals : 0;
+
+  const biggest = deals.reduce(
+    (max, d) => (d.value > max.value ? d : max),
+    { name: "None", value: 0 }
