@@ -227,7 +227,8 @@ export default function App() {
     owner: "Cezar",
     nextStep: "",
     closeDate: "",
-    notes: "",useEffect(() => {
+    notes: "",
+  });  useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(deals));
   }, [deals]);
 
@@ -421,7 +422,7 @@ export default function App() {
           <div style={cardStyle()}>
             <div style={{ fontSize: 22, fontWeight: 800, marginBottom: 16 }}>
               Add Deal
-            </div><div style={{ marginBottom: 12 }}>
+            </div>            <div style={{ marginBottom: 12 }}>
               <label style={labelStyle()}>Client Name</label>
               <input
                 style={inputStyle()}
@@ -860,5 +861,4 @@ export default function App() {
       </div>
     </div>
   );
-                    }
-  });
+}
