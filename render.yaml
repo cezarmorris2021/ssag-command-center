@@ -5,5 +5,10 @@ services:
     plan: free
     rootDir: backend
     buildCommand: npm install
-    startCommand: node src/server.js
+    startCommand: npm start
     autoDeploy: true
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: ssag-db
+          property: connectionString
