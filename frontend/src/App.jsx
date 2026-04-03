@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 
-const STORAGE_KEY = "ssag_command_center_full_v1";
+const STORAGE_KEY = "ssag-command-center-ssag-v1";
 
 const statusOptions = [
   "Lead",
@@ -16,6 +16,13 @@ const paymentOptions = [
   "Pending Payment",
   "Paid",
   "Overdue",
+];
+
+const divisionOptions = [
+  "Sentinel Zero",
+  "SSAG Core Ops",
+  "Compliance Advisory",
+  "Client Acquisition",
 ];
 
 const sourceOptions = [
@@ -34,6 +41,7 @@ const seedDeals = [
     id: 1,
     client: "Desert Ridge Dental",
     company: "Desert Ridge Dental",
+    division: "Sentinel Zero",
     service: "Risk Assessment",
     value: 4500,
     status: "Closed",
@@ -48,6 +56,7 @@ const seedDeals = [
     id: 2,
     client: "Phoenix HVAC LLC",
     company: "Phoenix HVAC LLC",
+    division: "Sentinel Zero",
     service: "Cybersecurity Risk Assessment",
     value: 2500,
     status: "Lead",
@@ -56,12 +65,13 @@ const seedDeals = [
     owner: "Cezar",
     nextStep: "Initial follow-up call",
     closeDate: "",
-    notes: "Good local fit. Decision maker requested pricing info.",
+    notes: "Good local fit. Requested pricing.",
   },
   {
     id: 3,
     client: "Copper State Medical",
     company: "Copper State Medical",
+    division: "Compliance Advisory",
     service: "Compliance Advisory",
     value: 3800,
     status: "Negotiation",
@@ -76,6 +86,7 @@ const seedDeals = [
     id: 4,
     client: "Summit Legal Group",
     company: "Summit Legal Group",
+    division: "Sentinel Zero",
     service: "Managed Security Package",
     value: 6200,
     status: "Proposal Sent",
@@ -98,6 +109,38 @@ function money(value) {
 
 function todayString() {
   return new Date().toISOString().slice(0, 10);
+}
+
+function cardStyle() {
+  return {
+    background: "#ffffff",
+    border: "1px solid #dbe1ea",
+    borderRadius: 18,
+    padding: 18,
+    boxShadow: "0 6px 20px rgba(15, 23, 42, 0.05)",
+  };
+}
+
+function inputStyle() {
+  return {
+    width: "100%",
+    padding: "12px 14px",
+    borderRadius: 12,
+    border: "1px solid #cbd5e1",
+    fontSize: 15,
+    boxSizing: "border-box",
+    background: "#fff",
+  };
+}
+
+function labelStyle() {
+  return {
+    display: "block",
+    fontSize: 13,
+    fontWeight: 700,
+    marginBottom: 6,
+    color: "#334155",
+  };
 }
 
 function getStatusColor(status) {
@@ -145,36 +188,16 @@ function pillStyle(bg, color) {
   };
 }
 
-function cardStyle() {
-  return {
-    background: "#fff",
-    border: "1px solid #dbe1ea",
-    borderRadius: 18,
-    padding: 18,
-    boxShadow: "0 6px 20px rgba(15, 23, 42, 0.05)",
-  };
-}
-
-function inputStyle() {
-  return {
-    width: "100%",
-    padding: "12px 14px",
-    borderRadius: 12,
-    border: "1px solid #cbd5e1",
-    fontSize: 15,
-    boxSizing: "border-box",
-    background: "#fff",
-  };
-}
-
-function labelStyle() {
-  return {
-    display: "block",
-    fontSize: 13,
-    fontWeight: 700,
-    marginBottom: 6,
-    color: "#334155",
-  };
+function StatCard({ label, value, sub }) {
+  return (
+    <div style={cardStyle()}>
+      <div style={{ fontSize: 13, color: "#64748b", fontWeight: 700 }}>{label}</div>
+      <div style={{ fontSize: 30, fontWeight: 800, marginTop: 8 }}>{value}</div>
+      {sub ? (
+        <div style={{ marginTop: 6, fontSize: 12, color: "#64748b" }}>{sub}</div>
+      ) : null}
+    </div>
+  );
 }
 
 export default function App() {
@@ -187,9 +210,15 @@ export default function App() {
     }
   });
 
+  const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState("All");
+  const [paymentFilter, setPaymentFilter] = useState("All");
+  const [divisionFilter, setDivisionFilter] = useState("All");
+
   const [form, setForm] = useState({
     client: "",
     company: "",
+    division: "Sentinel Zero",
     service: "",
     value: "",
     status: "Lead",
@@ -198,38 +227,32 @@ export default function App() {
     owner: "Cezar",
     nextStep: "",
     closeDate: "",
-    notes: "",
-  });
-
-  const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState("All");
-  const [paymentFilter, setPaymentFilter] = useState("All");
-
-  useEffect(() => {
+    notes: "",useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(deals));
   }, [deals]);
 
   const filteredDeals = useMemo(() => {
+    const q = search.trim().toLowerCase();
+
     return deals.filter((deal) => {
-      const searchText = search.trim().toLowerCase();
-
       const matchesSearch =
-        !searchText ||
-        deal.client.toLowerCase().includes(searchText) ||
-        deal.company.toLowerCase().includes(searchText) ||
-        deal.service.toLowerCase().includes(searchText) ||
-        deal.owner.toLowerCase().includes(searchText) ||
-        deal.source.toLowerCase().includes(searchText);
+        !q ||
+        deal.client.toLowerCase().includes(q) ||
+        deal.company.toLowerCase().includes(q) ||
+        deal.service.toLowerCase().includes(q) ||
+        deal.owner.toLowerCase().includes(q) ||
+        deal.source.toLowerCase().includes(q) ||
+        deal.division.toLowerCase().includes(q);
 
-      const matchesStatus =
-        statusFilter === "All" || deal.status === statusFilter;
-
+      const matchesStatus = statusFilter === "All" || deal.status === statusFilter;
       const matchesPayment =
         paymentFilter === "All" || deal.paymentStatus === paymentFilter;
+      const matchesDivision =
+        divisionFilter === "All" || deal.division === divisionFilter;
 
-      return matchesSearch && matchesStatus && matchesPayment;
+      return matchesSearch && matchesStatus && matchesPayment && matchesDivision;
     });
-  }, [deals, search, statusFilter, paymentFilter]);
+  }, [deals, search, statusFilter, paymentFilter, divisionFilter]);
 
   const metrics = useMemo(() => {
     const totalPipeline = deals.reduce((sum, deal) => sum + Number(deal.value || 0), 0);
@@ -243,20 +266,15 @@ export default function App() {
       .filter((deal) => deal.paymentStatus !== "Paid")
       .reduce((sum, deal) => sum + Number(deal.value || 0), 0);
 
-    const leadCount = deals.filter((deal) => deal.status === "Lead").length;
-    const negotiationCount = deals.filter((deal) => deal.status === "Negotiation").length;
-    const closedCount = deals.filter((deal) => deal.status === "Closed").length;
-    const overdueCount = deals.filter((deal) => deal.paymentStatus === "Overdue").length;
-
     return {
       totalPipeline,
       closedRevenue,
       paidRevenue,
       outstandingRevenue,
-      leadCount,
-      negotiationCount,
-      closedCount,
-      overdueCount,
+      leadCount: deals.filter((deal) => deal.status === "Lead").length,
+      negotiationCount: deals.filter((deal) => deal.status === "Negotiation").length,
+      closedCount: deals.filter((deal) => deal.status === "Closed").length,
+      overdueCount: deals.filter((deal) => deal.paymentStatus === "Overdue").length,
     };
   }, [deals]);
 
@@ -267,12 +285,13 @@ export default function App() {
 
         const updated = { ...deal, [field]: value };
 
-        if (field === "status" && value === "Closed" && !updated.closeDate) {
-          updated.closeDate = todayString();
-        }
-
-        if (field === "status" && value !== "Closed") {
-          updated.closeDate = "";
+        if (field === "status") {
+          if (value === "Closed" && !updated.closeDate) {
+            updated.closeDate = todayString();
+          }
+          if (value !== "Closed") {
+            updated.closeDate = "";
+          }
         }
 
         return updated;
@@ -289,12 +308,10 @@ export default function App() {
       alert("Add the client name.");
       return;
     }
-
     if (!form.service.trim()) {
       alert("Add the service.");
       return;
     }
-
     if (!form.value || Number(form.value) <= 0) {
       alert("Add a valid deal value.");
       return;
@@ -304,6 +321,7 @@ export default function App() {
       id: Date.now(),
       client: form.client.trim(),
       company: form.company.trim() || form.client.trim(),
+      division: form.division,
       service: form.service.trim(),
       value: Number(form.value),
       status: form.status,
@@ -320,6 +338,7 @@ export default function App() {
     setForm({
       client: "",
       company: "",
+      division: "Sentinel Zero",
       service: "",
       value: "",
       status: "Lead",
@@ -344,7 +363,7 @@ export default function App() {
         boxSizing: "border-box",
       }}
     >
-      <div style={{ maxWidth: 1200, margin: "0 auto" }}>
+      <div style={{ maxWidth: 1280, margin: "0 auto" }}>
         <div
           style={{
             ...cardStyle(),
@@ -353,13 +372,13 @@ export default function App() {
             color: "#fff",
           }}
         >
-          <div style={{ fontSize: 14, opacity: 0.8, marginBottom: 8 }}>
-            SSAG Standard • Command Layer
+          <div style={{ fontSize: 14, opacity: 0.82, marginBottom: 8 }}>
+            SSAG Level Build • Command Layer
           </div>
           <div style={{ fontSize: 34, fontWeight: 800, lineHeight: 1.1 }}>
             SSAG Command Center
           </div>
-          <div style={{ marginTop: 10, fontSize: 16, opacity: 0.85 }}>
+          <div style={{ marginTop: 10, fontSize: 16, opacity: 0.88 }}>
             Live pipeline control, payment tracking, and executive visibility.
           </div>
         </div>
@@ -372,41 +391,10 @@ export default function App() {
             marginBottom: 20,
           }}
         >
-          <div style={cardStyle()}>
-            <div style={{ fontSize: 13, color: "#64748b", fontWeight: 700 }}>
-              Total Pipeline
-            </div>
-            <div style={{ fontSize: 30, fontWeight: 800, marginTop: 8 }}>
-              {money(metrics.totalPipeline)}
-            </div>
-          </div>
-
-          <div style={cardStyle()}>
-            <div style={{ fontSize: 13, color: "#64748b", fontWeight: 700 }}>
-              Closed Revenue
-            </div>
-            <div style={{ fontSize: 30, fontWeight: 800, marginTop: 8 }}>
-              {money(metrics.closedRevenue)}
-            </div>
-          </div>
-
-          <div style={cardStyle()}>
-            <div style={{ fontSize: 13, color: "#64748b", fontWeight: 700 }}>
-              Paid Revenue
-            </div>
-            <div style={{ fontSize: 30, fontWeight: 800, marginTop: 8 }}>
-              {money(metrics.paidRevenue)}
-            </div>
-          </div>
-
-          <div style={cardStyle()}>
-            <div style={{ fontSize: 13, color: "#64748b", fontWeight: 700 }}>
-              Outstanding
-            </div>
-            <div style={{ fontSize: 30, fontWeight: 800, marginTop: 8 }}>
-              {money(metrics.outstandingRevenue)}
-            </div>
-          </div>
+          <StatCard label="Total Pipeline" value={money(metrics.totalPipeline)} />
+          <StatCard label="Closed Revenue" value={money(metrics.closedRevenue)} />
+          <StatCard label="Paid Revenue" value={money(metrics.paidRevenue)} />
+          <StatCard label="Outstanding" value={money(metrics.outstandingRevenue)} />
         </div>
 
         <div
@@ -417,39 +405,23 @@ export default function App() {
             marginBottom: 20,
           }}
         >
-          <div style={cardStyle()}>
-            <div style={{ fontSize: 13, color: "#64748b" }}>Leads</div>
-            <div style={{ fontSize: 28, fontWeight: 800 }}>{metrics.leadCount}</div>
-          </div>
-          <div style={cardStyle()}>
-            <div style={{ fontSize: 13, color: "#64748b" }}>Negotiation</div>
-            <div style={{ fontSize: 28, fontWeight: 800 }}>
-              {metrics.negotiationCount}
-            </div>
-          </div>
-          <div style={cardStyle()}>
-            <div style={{ fontSize: 13, color: "#64748b" }}>Closed Deals</div>
-            <div style={{ fontSize: 28, fontWeight: 800 }}>{metrics.closedCount}</div>
-          </div>
-          <div style={cardStyle()}>
-            <div style={{ fontSize: 13, color: "#64748b" }}>Overdue</div>
-            <div style={{ fontSize: 28, fontWeight: 800 }}>{metrics.overdueCount}</div>
-          </div>
+          <StatCard label="Leads" value={metrics.leadCount} />
+          <StatCard label="Negotiation" value={metrics.negotiationCount} />
+          <StatCard label="Closed Deals" value={metrics.closedCount} />
+          <StatCard label="Overdue" value={metrics.overdueCount} />
         </div>
 
         <div
           style={{
             display: "grid",
-            gridTemplateColumns: "minmax(320px, 380px) minmax(0, 1fr)",
+            gridTemplateColumns: "minmax(320px, 390px) minmax(0, 1fr)",
             gap: 20,
           }}
         >
           <div style={cardStyle()}>
             <div style={{ fontSize: 22, fontWeight: 800, marginBottom: 16 }}>
               Add Deal
-            </div>
-
-            <div style={{ marginBottom: 12 }}>
+            </div><div style={{ marginBottom: 12 }}>
               <label style={labelStyle()}>Client Name</label>
               <input
                 style={inputStyle()}
@@ -465,6 +437,19 @@ export default function App() {
                 value={form.company}
                 onChange={(e) => setForm({ ...form, company: e.target.value })}
               />
+            </div>
+
+            <div style={{ marginBottom: 12 }}>
+              <label style={labelStyle()}>Division</label>
+              <select
+                style={inputStyle()}
+                value={form.division}
+                onChange={(e) => setForm({ ...form, division: e.target.value })}
+              >
+                {divisionOptions.map((item) => (
+                  <option key={item}>{item}</option>
+                ))}
+              </select>
             </div>
 
             <div style={{ marginBottom: 12 }}>
@@ -609,7 +594,7 @@ export default function App() {
               <div
                 style={{
                   display: "grid",
-                  gridTemplateColumns: "minmax(180px, 1fr) 180px 180px",
+                  gridTemplateColumns: "minmax(180px, 1fr) 180px 180px 180px",
                   gap: 10,
                 }}
               >
@@ -621,6 +606,20 @@ export default function App() {
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                   />
+                </div>
+
+                <div>
+                  <label style={labelStyle()}>Division</label>
+                  <select
+                    style={inputStyle()}
+                    value={divisionFilter}
+                    onChange={(e) => setDivisionFilter(e.target.value)}
+                  >
+                    <option>All</option>
+                    {divisionOptions.map((item) => (
+                      <option key={item}>{item}</option>
+                    ))}
+                  </select>
                 </div>
 
                 <div>
@@ -677,4 +676,189 @@ export default function App() {
                         gap: 12,
                         alignItems: "flex-start",
                         marginBottom: 12,
-                   
+                        flexWrap: "wrap",
+                      }}
+                    >
+                      <div>
+                        <div style={{ fontSize: 28, fontWeight: 800 }}>
+                          {deal.client}
+                        </div>
+                        <div style={{ color: "#64748b", marginTop: 4, fontSize: 15 }}>
+                          {deal.company} • {deal.service} • {deal.division}
+                        </div>
+                      </div>
+
+                      <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                        <span style={pillStyle(statusColor.bg, statusColor.color)}>
+                          {deal.status}
+                        </span>
+                        <span style={pillStyle(paymentColor.bg, paymentColor.color)}>
+                          {deal.paymentStatus}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div
+                      style={{
+                        display: "grid",
+                        gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))",
+                        gap: 12,
+                        marginBottom: 14,
+                      }}
+                    >
+                      <div>
+                        <div style={{ fontSize: 12, color: "#64748b", fontWeight: 700 }}>
+                          Value
+                        </div>
+                        <div style={{ fontSize: 26, fontWeight: 800 }}>
+                          {money(deal.value)}
+                        </div>
+                      </div>
+
+                      <div>
+                        <div style={{ fontSize: 12, color: "#64748b", fontWeight: 700 }}>
+                          Owner
+                        </div>
+                        <div style={{ fontSize: 17, fontWeight: 700 }}>{deal.owner}</div>
+                      </div>
+
+                      <div>
+                        <div style={{ fontSize: 12, color: "#64748b", fontWeight: 700 }}>
+                          Source
+                        </div>
+                        <div style={{ fontSize: 17, fontWeight: 700 }}>{deal.source}</div>
+                      </div>
+
+                      <div>
+                        <div style={{ fontSize: 12, color: "#64748b", fontWeight: 700 }}>
+                          Close Date
+                        </div>
+                        <div style={{ fontSize: 17, fontWeight: 700 }}>
+                          {deal.closeDate || "—"}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div style={{ marginBottom: 12 }}>
+                      <div style={{ fontSize: 12, color: "#64748b", fontWeight: 700 }}>
+                        Next Step
+                      </div>
+                      <input
+                        style={{ ...inputStyle(), marginTop: 6 }}
+                        value={deal.nextStep}
+                        onChange={(e) =>
+                          updateDeal(deal.id, "nextStep", e.target.value)
+                        }
+                      />
+                    </div>
+
+                    <div style={{ marginBottom: 14 }}>
+                      <div style={{ fontSize: 12, color: "#64748b", fontWeight: 700 }}>
+                        Notes
+                      </div>
+                      <textarea
+                        style={{
+                          ...inputStyle(),
+                          minHeight: 90,
+                          resize: "vertical",
+                          marginTop: 6,
+                        }}
+                        value={deal.notes}
+                        onChange={(e) => updateDeal(deal.id, "notes", e.target.value)}
+                      />
+                    </div>
+
+                    <div
+                      style={{
+                        display: "grid",
+                        gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
+                        gap: 12,
+                        marginBottom: 14,
+                      }}
+                    >
+                      <div>
+                        <label style={labelStyle()}>Status</label>
+                        <select
+                          style={inputStyle()}
+                          value={deal.status}
+                          onChange={(e) =>
+                            updateDeal(deal.id, "status", e.target.value)
+                          }
+                        >
+                          {statusOptions.map((item) => (
+                            <option key={item}>{item}</option>
+                          ))}
+                        </select>
+                      </div>
+
+                      <div>
+                        <label style={labelStyle()}>Payment Status</label>
+                        <select
+                          style={inputStyle()}
+                          value={deal.paymentStatus}
+                          onChange={(e) =>
+                            updateDeal(deal.id, "paymentStatus", e.target.value)
+                          }
+                        >
+                          {paymentOptions.map((item) => (
+                            <option key={item}>{item}</option>
+                          ))}
+                        </select>
+                      </div>
+
+                      <div>
+                        <label style={labelStyle()}>Owner</label>
+                        <select
+                          style={inputStyle()}
+                          value={deal.owner}
+                          onChange={(e) =>
+                            updateDeal(deal.id, "owner", e.target.value)
+                          }
+                        >
+                          {ownerOptions.map((item) => (
+                            <option key={item}>{item}</option>
+                          ))}
+                        </select>
+                      </div>
+
+                      <div>
+                        <label style={labelStyle()}>Source</label>
+                        <select
+                          style={inputStyle()}
+                          value={deal.source}
+                          onChange={(e) =>
+                            updateDeal(deal.id, "source", e.target.value)
+                          }
+                        >
+                          {sourceOptions.map((item) => (
+                            <option key={item}>{item}</option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+
+                    <button
+                      onClick={() => deleteDeal(deal.id)}
+                      style={{
+                        border: "none",
+                        background: "#fee2e2",
+                        color: "#991b1b",
+                        padding: "10px 14px",
+                        borderRadius: 12,
+                        fontWeight: 800,
+                        cursor: "pointer",
+                      }}
+                    >
+                      Delete Deal
+                    </button>
+                  </div>
+                );
+              })
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+                    }
+  });
