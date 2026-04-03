@@ -1,26 +1,16 @@
 import express from "express";
-import path from "path";
-import { fileURLToPath } from "url";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Fix __dirname
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-// API test route
-app.get("/api/health", (req, res) => {
-  res.json({ status: "SSAG backend running" });
+// Root test
+app.get("/", (req, res) => {
+  res.send("SSAG Command Center Backend is LIVE");
 });
 
-// Serve frontend (auto)
-const frontendPath = path.join(__dirname, "../../frontend");
-
-app.use(express.static(frontendPath));
-
-app.get("*", (req, res) => {
-  res.sendFile(path.join(frontendPath, "index.html"));
+// API test
+app.get("/api/health", (req, res) => {
+  res.json({ status: "SSAG backend running" });
 });
 
 app.listen(PORT, () => {
