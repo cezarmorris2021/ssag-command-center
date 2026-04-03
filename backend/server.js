@@ -273,7 +273,6 @@ function getStats(deals) {
 </html>
   `);
 });
-    
   };
 }app.get("/deals", (req, res) => {
   res.json(loadDeals());
