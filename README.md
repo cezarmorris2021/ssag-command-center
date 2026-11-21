@@ -1,58 +1,27 @@
-# SSAG Command Center Full Stack
+# SSAG Command Center
 
-SSAG-level full-stack starter for a live company command center.
+## Current status: not ready for customer or business records
 
-## What this build includes
-- React frontend dashboard
-- Express backend API
-- JWT authentication
-- JSON-file persistence for quick startup
-- Live dashboard polling
-- Divisions, deals, clients, invoices, alerts, activity log
-- Professional documentation
+The backend currently provides a basic health response. Its deal read, deal write, and statistics routes intentionally return an unavailable response because this repository does not yet have a verified, signed-in, long-term data service.
 
-## Why I added extra features automatically
-These were added because they are foundational enterprise pieces people often need but do not always know to ask for:
-- authentication
-- API layer
-- persistent storage
-- seed admin user
-- alerts engine
-- audit/activity log
-- import/export endpoint
-- system documentation
+The current source does not provide a working sign-in, role permissions, or a connected persistent CRM. A health response only confirms the server process answered; it does not confirm that the command center works.
 
-## Quick start
-### Backend
-1. Open terminal in `backend`
-2. Run `npm install`
-3. Run `npm run dev`
-4. Backend starts on `http://localhost:4000`
+Do not enter real customer, financial, or private business information here. Do not treat this repository as the SSAG system of record.
 
-### Frontend
-1. Open another terminal in `frontend`
-2. Run `npm install`
-3. Run `npm run dev`
-4. Open the local URL Vite shows you
+## What the repository contains
 
-## Default login
-- Email: `admin@ssag.local`
-- Password: `ChangeMe123!`
+- An Express server with a basic health route
+- A limited in-memory compatibility layer that must not be used for real records
+- A deployment configuration and documentation
 
-Change the password immediately after setup.
+The user interface and complete customer workflow have not been verified from this repository. Any old sample login details in earlier documentation were not proof of a working login and have been removed. Do not reuse the old default password.
 
-## Recommended next production upgrades
-- Postgres instead of JSON file storage
-- HTTPS deployment
-- role-based permissions
-- real email integration
-- file/document storage
-- notification service
-- backup automation
+## What must be true before this can be called production-ready
 
+- A real sign-in system with owner/admin permissions
+- A protected database that keeps records after the service restarts
+- Working owner interface connected to that database
+- Audit history and backups
+- Verified, authorized create/read/update behavior with timestamps and access checks
 
-## Deployment-ready additions
-- Render backend blueprint (`render.yaml`)
-- Vercel frontend config (`frontend/vercel.json`)
-- Environment variable examples
-- `DEPLOY_NOW.md` step-by-step deployment guide
+Use the latest supervisor report and the repository's root `AGENTS.md` before making further changes.
