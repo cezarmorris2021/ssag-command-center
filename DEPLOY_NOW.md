@@ -1,71 +1,24 @@
-# SSAG Command Center - Deploy Now Guide
+# SSAG Command Center: deployment status
 
-This package is prepared for a simple production-style deployment:
-- Frontend on Vercel
-- Backend on Render
+## Do not use this as a live CRM yet
 
-## What you need
-1. A GitHub account
-2. A Vercel account
-3. A Render account
-4. Later: your SSAG domain
+The current backend source deliberately disables deal reads, deal writes, and deal statistics. It has no verified sign-in, role checks, or durable database connection. A server status response is not proof that the CRM works.
 
-## Folder layout
-- `frontend/` -> Vite React app
-- `backend/` -> Express API
-- `render.yaml` -> Render backend blueprint
-- `frontend/vercel.json` -> Vercel frontend config
+The old guide contained a default sample password. That text has been removed; it must not be used or reused.
 
-## Step 1 - Put the code on GitHub
-1. Unzip this package.
-2. Create a new GitHub repository.
-3. Upload the `ssag_command_center_fullstack` folder contents.
+## What is safe to check
 
-## Step 2 - Deploy the backend on Render
-1. Sign in to Render.
-2. Click New > Web Service.
-3. Connect your GitHub repository.
-4. Select the repository.
-5. Set Root Directory to `ssag_command_center_fullstack/backend`.
-6. Runtime: Node.
-7. Build Command: `npm install`
-8. Start Command: `npm start`
-9. Add environment variables:
-   - `JWT_SECRET` = long random secret
-   - `CORS_ORIGIN` = your frontend Vercel URL after frontend is deployed
-10. Deploy.
-11. Copy the backend URL. Example: `https://ssag-command-center-backend.onrender.com`
+- The service process can answer its health route.
+- The health route reports that its memory-only data is not durable.
+- The deal routes return an unavailable response until a protected, persistent system is built and verified.
 
-## Step 3 - Deploy the frontend on Vercel
-1. Sign in to Vercel.
-2. Click Add New > Project.
-3. Import the same GitHub repository.
-4. Set Root Directory to `ssag_command_center_fullstack/frontend`.
-5. Add environment variable:
-   - `VITE_API_BASE` = `https://YOUR-RENDER-URL/api`
-6. Deploy.
-7. Copy the Vercel URL.
+## Requirements before live use
 
-## Step 4 - Tighten backend CORS
-1. Go back to Render.
-2. Edit `CORS_ORIGIN`.
-3. Paste your Vercel app URL.
-4. Save and redeploy.
+1. Build and connect an owner interface to the correct data service.
+2. Add working sign-in and owner/admin access checks.
+3. Connect durable storage and backups.
+4. Keep secrets in the hosting provider's secret settings, never in page code or public documentation.
+5. Confirm one authorized record can be created, read back after a restart, and seen only by the correct account.
+6. Review the service logs and alerts for failures.
 
-## Step 5 - Log in
-Default login:
-- Email: `admin@ssag.local`
-- Password: `ChangeMe123!`
-
-Change the password in code/database before production use.
-
-## Step 6 - Connect a custom domain later
-- Frontend custom domain -> Vercel project settings
-- Backend custom domain -> Render service settings
-
-## Recommended immediate upgrades
-1. Replace JSON persistence with Postgres
-2. Add password reset flow
-3. Add role-based permissions
-4. Add file/document uploads
-5. Add real email integration
+The deployment file alone does not prove these requirements are met. Keep real customer and financial records out of this service until each item has evidence.
