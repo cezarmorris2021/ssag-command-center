@@ -1,1 +1,47 @@
-
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#091425">
+<meta name="description" content="SSAG Command Center — owner system status and verified access points.">
+<title>SSAG | Command Center</title>
+<style>
+:root{color-scheme:dark;font-family:system-ui,-apple-system,Segoe UI,sans-serif;background:#07111f;color:#edf4ff}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(circle at 90% 0%,#16345a 0%,#07111f 48%)}
+header,main,footer{max-width:1100px;margin:auto;padding:24px}header{display:flex;align-items:center;justify-content:space-between;gap:16px;border-bottom:1px solid #263c55}
+.brand{font-weight:800;letter-spacing:.12em}.tag{font-size:.75rem;border:1px solid #50708e;border-radius:99px;padding:8px 12px;color:#bcd4ee}
+h1{font-size:clamp(2.2rem,7vw,4.3rem);line-height:1.07;letter-spacing:-.045em;margin:26px 0 14px}h2{font-size:1.15rem;margin:0 0 12px}
+p{line-height:1.65;color:#bdd0e7}.intro{max-width:720px;font-size:1.12rem}.notice{border-left:4px solid #f5bd68;background:#2c251d;padding:16px 20px;border-radius:0 12px 12px 0;margin:26px 0;color:#ffdda7}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(245px,1fr));gap:16px;margin:28px 0}
+.card{border:1px solid #2b425e;border-radius:16px;padding:22px;background:#0e2035;min-height:175px}
+.kicker{font-size:.73rem;text-transform:uppercase;letter-spacing:.13em;color:#7faccf;font-weight:700}
+.state{display:inline-block;color:#ffcf86;font-weight:700;font-size:.86rem;margin-top:8px}
+a{color:#8ed4ff;text-underline-offset:4px}a:focus-visible{outline:3px solid #f5bd68;outline-offset:4px}
+.actions{display:flex;gap:12px;flex-wrap:wrap;margin:24px 0}
+.action{display:inline-block;border-radius:10px;padding:13px 17px;background:#2e77c5;color:white;text-decoration:none;font-weight:700}
+.action.secondary{background:transparent;border:1px solid #54718e;color:#d7ebff}
+footer{border-top:1px solid #263c55;color:#8ba8c7;font-size:.82rem}
+@media(max-width:520px){header,main,footer{padding:18px}.tag{font-size:.66rem}}
+</style>
+</head>
+<body>
+<header><div class="brand">SSAG <span style="color:#76bdf4">/</span> COMMAND CENTER</div><span class="tag">Owner systems</span></header>
+<main>
+<div class="kicker">Strategic Systems Advisory Group</div>
+<h1>Command Center</h1>
+<p class="intro">Your central access point for SSAG operations. This page is available as a static website; operational integrations are being verified separately.</p>
+<div class="notice" role="status"><strong>Operational notice:</strong> This page is not a signed-in CRM. Customer records, payment processing, automated calling and permanent shared storage are not enabled here. Do not enter private customer or financial information.</div>
+<section aria-label="System readiness" class="grid">
+<article class="card"><div class="kicker">Website</div><h2>Command Center landing page</h2><p>Static interface published from this repository. No account sign-in is required to view this page.</p><span class="state">Static page only</span></article>
+<article class="card"><div class="kicker">Customer management</div><h2>Persistent CRM</h2><p>Secure sign-in, protected customer records and permanent database transactions require end-to-end acceptance.</p><span class="state">Not verified / unavailable here</span></article>
+<article class="card"><div class="kicker">Operations</div><h2>Calls, payments and dispatch</h2><p>Provider connections and actual business activity are not verified by this page.</p><span class="state">Not verified / unavailable here</span></article>
+</section>
+<h2>Verified access points</h2>
+<p>Use these links to inspect the project source and current engineering work. Neither link is a customer login.</p>
+<nav class="actions" aria-label="Project links">
+<a class="action" href="https://github.com/cezarmorris2021/ssag-command-center">View project repository</a>
+<a class="action secondary" href="https://github.com/cezarmorris2021/ssag-command-center/pulls">Review open repairs</a>
+</nav>
+</main>
+<footer>SSAG Command Center · Public status landing page · No sample customers or financial totals are displayed.</footer>
+</body></html>
